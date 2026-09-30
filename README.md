@@ -13,7 +13,8 @@ entregables/
 | Entregable | Estado |
 |---|---|
 | Documento de interpretación (1-2 cuartillas) | ⏳ pendiente |
-| Copia final en `entregables/Parte_1/` y `entregables/Parte_2/` | ⏳ pendiente |
+| Copia final en `entregables/Parte_1/` | ✅ concluida |
+| Copia final en `entregables/Parte_2/` | ⏳ pendiente |
 
 ## Caso de uso: Datos Geoespaciales DENUE
 
@@ -56,9 +57,9 @@ El notebook clasifica cada sucursal por marca de AFORE y genera
 
 ```
 GeoEsp_DENUE/
-├── config/                  # config.yaml (rutas, parámetros) y crs_config.yaml (proyecciones)
+├── config/                  # config.yaml (rutas, parámetros) y crs_config.yaml
 ├── data/
-│   ├── raw/                 # DENUE completo, sin filtrar (JSON + CSV, con timestamp, no versionado)
+│   ├── raw/                 # DENUE completo, sin filtrar (JSON + CSV, con timestamp)
 │   ├── interim/             # Datos en transformación
 │   ├── processed/           # denue/ (CSV limpio + filtrado) + afores_denue.gpkg (con geometría)
 │   └── external/            # Capas auxiliares (límites administrativos)
@@ -67,7 +68,7 @@ GeoEsp_DENUE/
 │   ├── ingesta/              # descargar_denue.py — API DENUE v1
 │   ├── preprocesamiento/     # limpiar_denue.py — coordenadas, clasificación por marca
 │   ├── caracteristicas/      # construir_caracteristicas.py — geometría (GeoDataFrame)
-│   ├── analisis_geoespacial/ # densidad.py, proximidad.py, cobertura.py
+│   ├── analisis_geoespacial/ 
 │   ├── visualizacion/        # mapas_estaticos.py, mapas_interactivos.py
 │   └── utilidades/            # entrada_salida.py, utilidades_geo.py
 ├── reports/
@@ -87,13 +88,15 @@ un solo estado/giro como en el ejercicio de clase.
 
 ### Parte 1 — Réplica (obligatoria)
 
+**Estado: ✅ concluida** — ver evidencia en [`entregables/Parte_1/`](entregables/Parte_1/).
+
 | Requisito | Estado |
 |---|---|
 | Descarga del DENUE (API, `make download-denue`) | ✅ |
 | Diccionario de datos (≥5 variables) | ✅ ver tabla abajo |
 | Filtro del giro (AFOREs) + reporte de faltantes/duplicados | ✅ `make process-denue` y cifras control en `01_exploracion.ipynb` |
-| Conteo de unidades por municipio (tabla) | ⏳ pendiente (hoy el notebook agrega por marca y por estado, falta el corte por municipio) |
-| Mapa de puntos | ✅ estático (`reports/figures/`) e interactivo filtrable (`reports/maps/`) |
+| Conteo de unidades por municipio (tabla) | ✅ [`entregables/Parte_1/04_Unidades_x_Municipio.md`](entregables/Parte_1/04_Unidades_x_Municipio.md) |
+| Mapa de puntos | ✅ estático (`reports/figures/`) e interactivo filtrable (`reports/maps/`), más el mapa de réplica en R/leaflet ([`entregables/Parte_1/05_Mapa_Puntos.md`](entregables/Parte_1/05_Mapa_Puntos.md)) |
 
 
 ### Parte 2 — Reto
@@ -111,11 +114,11 @@ un solo estado/giro como en el ejercicio de clase.
 
 | Criterio | Puntos | Estado |
 |---|---|---|
-| Parte 1 completa | 25 | ⏳ falta conteo por municipio |
-| Limpieza documentada (faltantes, duplicados) | 10 | ✅ |
-| Parte 2: reto + requisito de rigor | 35 | ⏳ pendiente elegir opción |
-| Interpretación escrita y justificación | 20 | ⏳ pendiente |
-| Código reproducible, comentado, en tiempo | 10 | ✅ |
+| Parte 1 completa | 25 | 
+| Limpieza documentada (faltantes, duplicados) | 10 |
+| Parte 2: reto + requisito de rigor | 35 |
+| Interpretación escrita y justificación | 20 |
+| Código reproducible, comentado, en tiempo | 10 |
 
 
 ## Anexos
