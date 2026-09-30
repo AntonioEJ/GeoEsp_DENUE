@@ -65,7 +65,7 @@ denue:
   directorio_procesado: "data/processed/denue"
   # Genera un CSV adicional filtrado por este texto sobre nombre/razón
   # social (ej. "PROFUTURO"). Vacío ("") desactiva el CSV de subconjunto.
-  palabra_clave_subconjunto: "PROFUTURO"
+  palabra_clave_subconjunto: "AFORE"
 
 analisis:
   radio_buffer_m: 1000

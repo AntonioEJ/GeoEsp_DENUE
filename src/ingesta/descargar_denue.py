@@ -67,6 +67,34 @@ COLUMNAS_NOMBRE_CANDIDATAS: tuple[str, ...] = (
     "razon_social",
     "raz_social",
 )
+# Mapeo de los campos de la API DENUE (PascalCase) a los encabezados del
+# diccionario oficial de datos de la descarga masiva de INEGI (snake_case).
+# Se usa solo para la ruta legado denue_inegi_09_.csv, que scripts existentes
+# (ej. entregables/Parte_1/01_leer_denue.R) esperan leer con esos nombres.
+MAPEO_COLUMNAS_API_A_INEGI: dict[str, str] = {
+    "Id": "id",
+    "CLEE": "clee",
+    "Nombre": "nom_estab",
+    "Razon_social": "raz_social",
+    "Clase_actividad": "nombre_act",
+    "Estrato": "per_ocu",
+    "Tipo_vialidad": "tipo_vial",
+    "Calle": "nom_vial",
+    "Num_Exterior": "numero_ext",
+    "Num_Interior": "numero_int",
+    "Colonia": "nomb_asent",
+    "CP": "cod_postal",
+    "Ubicacion": "municipio",
+    "Telefono": "telefono",
+    "Correo_e": "correoelec",
+    "Sitio_internet": "www",
+    "Tipo": "tipoUniEco",
+    "Longitud": "longitud",
+    "Latitud": "latitud",
+    "tipo_corredor_industrial": "tipoCenCom",
+    "nom_corredor_industrial": "nom_CenCom",
+    "numero_local": "num_local",
+}
 
 
 class ErrorApiDenue(RuntimeError):
@@ -378,6 +406,50 @@ def escribir_csv_subconjunto_nacional(
     return ruta_csv_nacional
 
 
+def limpiar_municipio_desde_ubicacion(serie_ubicacion: pd.Series) -> pd.Series:
+    """Extrae el nombre de municipio limpio del campo ``Ubicacion`` de la API.
+
+    La API devuelve ``Ubicacion`` como texto combinado con el formato
+    ``"<localidad>, <municipio>, <entidad>"`` (con saltos de línea/espacios
+    de relleno alrededor de la localidad). Se toma solo la parte de en medio.
+
+    Args:
+        serie_ubicacion: Columna ``Ubicacion`` tal como la entrega la API.
+
+    Returns:
+        Serie con el nombre de municipio, o el valor original si no tiene
+        el formato de 3 partes separadas por coma.
+    """
+    partes = serie_ubicacion.astype(str).str.split(",")
+    return partes.apply(lambda p: p[1].strip() if len(p) == 3 else "\n".join(p).strip())
+
+
+def copiar_csv_a_ruta_legado(ruta_csv_origen: Path, directorio_procesado: Path) -> Path:
+    """Copia un CSV (entidad 09) a la ruta legado, con encabezados del formato oficial INEGI.
+
+    Mantiene compatibilidad con scripts que leen la estructura de la descarga
+    masiva del portal INEGI (``denue_09_csv/conjunto_de_datos/denue_inegi_09_.csv``),
+    renombrando las columnas de la API DENUE (PascalCase) a los nombres del
+    diccionario oficial de datos (snake_case, ej. ``nom_estab``, ``latitud``)
+    y limpiando ``municipio`` (la API solo da el texto combinado ``Ubicacion``).
+
+    Args:
+        ruta_csv_origen: Ruta del CSV de la entidad 09 ya escrito (esquema API).
+        directorio_procesado: Carpeta base de processed (ej. ``data/processed/denue``).
+
+    Returns:
+        Ruta de la copia generada.
+    """
+    ruta_legado = directorio_procesado / "denue_09_csv" / "conjunto_de_datos" / "denue_inegi_09_.csv"
+    ruta_legado.parent.mkdir(parents=True, exist_ok=True)
+    df_legado = pd.read_csv(ruta_csv_origen).rename(columns=MAPEO_COLUMNAS_API_A_INEGI)
+    if "municipio" in df_legado.columns:
+        df_legado["municipio"] = limpiar_municipio_desde_ubicacion(df_legado["municipio"])
+    df_legado.to_csv(ruta_legado, index=False, encoding="utf-8-sig")
+    logger.info("CSV de la entidad 09 con encabezados INEGI en ruta legado -> %s", ruta_legado)
+    return ruta_legado
+
+
 def descargar_entidad(
     codigo_entidad: str, configuracion: ConfiguracionDescargaDenue, marca_tiempo: str
 ) -> tuple[SalidasEntidad | None, list[str], pd.DataFrame | None]:
@@ -518,6 +590,16 @@ def descargar_denue(configuracion: ConfiguracionDescargaDenue) -> list[SalidasEn
             marca_tiempo,
             configuracion.palabra_clave_subconjunto,
         )
+        # Ruta legado (formato descarga masiva INEGI): solo entidad 09, no el
+        # acumulado nacional.
+        salida_entidad_09 = next((s for s in salidas if s.codigo_entidad == "09"), None)
+        if salida_entidad_09 is not None and salida_entidad_09.ruta_csv_subconjunto is not None:
+            copiar_csv_a_ruta_legado(salida_entidad_09.ruta_csv_subconjunto, configuracion.directorio_procesado)
+        else:
+            logger.warning(
+                "No se generó denue_inegi_09_.csv: la entidad '09' no tiene subconjunto "
+                "(revisa codigos_entidad en config.yaml)"
+            )
 
     # Cifras control (DQ) - regla obligatoria de CLAUDE.md
     total_llamadas = len(configuracion.terminos_busqueda) * len(configuracion.codigos_entidad)

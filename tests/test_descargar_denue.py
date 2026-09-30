@@ -11,11 +11,13 @@ from src.ingesta.descargar_denue import (
     ConfiguracionDescargaDenue,
     ErrorApiDenue,
     _eliminar_duplicados,
+    copiar_csv_a_ruta_legado,
     descargar_denue,
     escribir_csv_completo,
     escribir_csv_subconjunto,
     escribir_csv_subconjunto_nacional,
     filtrar_por_palabra_clave,
+    limpiar_municipio_desde_ubicacion,
     obtener_registros_entidad,
 )
 
@@ -147,11 +149,63 @@ def test_escribir_csv_subconjunto_nacional_retorna_none_sin_coincidencias(tmp_pa
     assert escribir_csv_subconjunto_nacional([], tmp_path, "20260101_000000", "PROFUTURO") is None
 
 
+def test_copiar_csv_a_ruta_legado_crea_estructura_inegi(tmp_path: Path):
+    ruta_origen = tmp_path / "denue_profuturo_09_20260101_000000.csv"
+    pd.DataFrame({"Id": ["1"], "Nombre": ["AFORE PROFUTURO"]}).to_csv(ruta_origen, index=False)
+
+    ruta_legado = copiar_csv_a_ruta_legado(ruta_origen, tmp_path)
+
+    assert ruta_legado == tmp_path / "denue_09_csv" / "conjunto_de_datos" / "denue_inegi_09_.csv"
+    assert ruta_legado.exists()
+    assert len(pd.read_csv(ruta_legado)) == 1
+
+
+def test_copiar_csv_a_ruta_legado_renombra_encabezados_a_formato_inegi(tmp_path: Path):
+    # La ruta legado la lee entregables/Parte_1/01_leer_denue.R, que espera
+    # los nombres oficiales de INEGI (nom_estab, latitud, longitud), no el
+    # esquema PascalCase de la API (Nombre, Latitud, Longitud).
+    ruta_origen = tmp_path / "denue_profuturo_09_20260101_000000.csv"
+    pd.DataFrame(
+        {"Id": ["1"], "Nombre": ["AFORE PROFUTURO"], "Latitud": [19.4], "Longitud": [-99.1]}
+    ).to_csv(ruta_origen, index=False)
+
+    ruta_legado = copiar_csv_a_ruta_legado(ruta_origen, tmp_path)
+
+    columnas = list(pd.read_csv(ruta_legado).columns)
+    assert "nom_estab" in columnas
+    assert "latitud" in columnas
+    assert "longitud" in columnas
+    assert "Nombre" not in columnas
+
+
+def test_limpiar_municipio_desde_ubicacion_extrae_parte_de_en_medio():
+    serie = pd.Series(["IZTAPALAPA\n                    , Iztapalapa, CIUDAD DE MÉXICO"])
+
+    resultado = limpiar_municipio_desde_ubicacion(serie)
+
+    assert resultado.iloc[0] == "Iztapalapa"
+
+
+def test_copiar_csv_a_ruta_legado_limpia_municipio(tmp_path: Path):
+    ruta_origen = tmp_path / "denue_profuturo_09_20260101_000000.csv"
+    pd.DataFrame(
+        {
+            "Id": ["1"],
+            "Nombre": ["AFORE PROFUTURO"],
+            "Ubicacion": ["IZTAPALAPA\n                    , Iztapalapa, CIUDAD DE MÉXICO"],
+        }
+    ).to_csv(ruta_origen, index=False)
+
+    ruta_legado = copiar_csv_a_ruta_legado(ruta_origen, tmp_path)
+
+    assert pd.read_csv(ruta_legado).iloc[0]["municipio"] == "Iztapalapa"
+
+
 def _configuracion_dos_entidades(tmp_path: Path, **overrides) -> ConfiguracionDescargaDenue:
     base = {
         "terminos_busqueda": ["AFORE"],
         "token": "fake-token",
-        "codigos_entidad": ["9", "15"],
+        "codigos_entidad": ["09", "15"],
         "directorio_crudo": tmp_path / "crudo",
         "directorio_procesado": tmp_path / "procesado",
     }
@@ -161,7 +215,7 @@ def _configuracion_dos_entidades(tmp_path: Path, **overrides) -> ConfiguracionDe
 
 def test_descargar_denue_genera_un_archivo_por_entidad(monkeypatch, tmp_path: Path):
     def obtener_registros_falso(termino_busqueda, codigo_entidad, token, tamano_pagina, segundos_espera):
-        nombres = {"9": "AFORE PROFUTURO CDMX", "15": "AFORE COPPEL EDOMEX"}
+        nombres = {"09": "AFORE PROFUTURO CDMX", "15": "AFORE COPPEL EDOMEX"}
         return [{"Id": f"{codigo_entidad}-1", "Nombre": nombres[codigo_entidad]}]
 
     monkeypatch.setattr(
@@ -175,16 +229,16 @@ def test_descargar_denue_genera_un_archivo_por_entidad(monkeypatch, tmp_path: Pa
     assert len(salidas) == 2
     salidas_por_entidad = {s.codigo_entidad: s for s in salidas}
 
-    # Entidad 9: coincide con la palabra clave -> genera subconjunto
-    salida_9 = salidas_por_entidad["9"]
-    assert salida_9.ruta_json.exists()
-    assert salida_9.ruta_json.parent == configuracion.directorio_crudo
-    assert salida_9.ruta_csv.exists()
-    assert salida_9.ruta_csv.parent == configuracion.directorio_crudo
-    assert salida_9.ruta_csv_subconjunto is not None
-    assert salida_9.ruta_csv_subconjunto.parent == configuracion.directorio_procesado
-    assert len(pd.read_csv(salida_9.ruta_csv)) == 1
-    assert len(pd.read_csv(salida_9.ruta_csv_subconjunto)) == 1
+    # Entidad 09: coincide con la palabra clave -> genera subconjunto
+    salida_09 = salidas_por_entidad["09"]
+    assert salida_09.ruta_json.exists()
+    assert salida_09.ruta_json.parent == configuracion.directorio_crudo
+    assert salida_09.ruta_csv.exists()
+    assert salida_09.ruta_csv.parent == configuracion.directorio_crudo
+    assert salida_09.ruta_csv_subconjunto is not None
+    assert salida_09.ruta_csv_subconjunto.parent == configuracion.directorio_procesado
+    assert len(pd.read_csv(salida_09.ruta_csv)) == 1
+    assert len(pd.read_csv(salida_09.ruta_csv_subconjunto)) == 1
 
     # Entidad 15: no coincide con la palabra clave -> subconjunto vacío (0 filas)
     salida_15 = salidas_por_entidad["15"]
@@ -192,10 +246,41 @@ def test_descargar_denue_genera_un_archivo_por_entidad(monkeypatch, tmp_path: Pa
     assert len(pd.read_csv(salida_15.ruta_csv_subconjunto)) == 0
     assert len(pd.read_csv(salida_15.ruta_csv)) == 1
 
-    # CSV nacional acumulado: solo la fila de la entidad 9, que sí coincidió
+    # CSV nacional acumulado: solo la fila de la entidad 09, que sí coincidió
     rutas_nacionales = list(configuracion.directorio_procesado.glob("denue_profuturo_nacional_*.csv"))
     assert len(rutas_nacionales) == 1
     assert len(pd.read_csv(rutas_nacionales[0])) == 1
+
+    # Copia en la ruta legado de la descarga masiva del portal INEGI (solo entidad 09)
+    ruta_legado = configuracion.directorio_procesado / "denue_09_csv" / "conjunto_de_datos" / "denue_inegi_09_.csv"
+    assert ruta_legado.exists()
+    assert len(pd.read_csv(ruta_legado)) == 1
+
+
+def test_descargar_denue_ruta_legado_solo_incluye_entidad_09(monkeypatch, tmp_path: Path):
+    # Las entidades 09 y 15 coinciden con la palabra clave -> el nacional
+    # acumula ambas, pero la ruta legado (denue_inegi_09_.csv) debe quedarse
+    # solo con los registros de la entidad 09.
+    def obtener_registros_falso(termino_busqueda, codigo_entidad, token, tamano_pagina, segundos_espera):
+        nombres = {"09": "AFORE PROFUTURO CDMX", "15": "AFORE PROFUTURO EDOMEX"}
+        return [{"Id": f"{codigo_entidad}-1", "Nombre": nombres[codigo_entidad]}]
+
+    monkeypatch.setattr(
+        "src.ingesta.descargar_denue.obtener_registros_entidad", obtener_registros_falso
+    )
+
+    configuracion = _configuracion_dos_entidades(tmp_path, palabra_clave_subconjunto="PROFUTURO")
+
+    descargar_denue(configuracion)
+
+    rutas_nacionales = list(configuracion.directorio_procesado.glob("denue_profuturo_nacional_*.csv"))
+    assert len(pd.read_csv(rutas_nacionales[0])) == 2  # nacional: entidad 09 + 15
+
+    ruta_legado = configuracion.directorio_procesado / "denue_09_csv" / "conjunto_de_datos" / "denue_inegi_09_.csv"
+    df_legado = pd.read_csv(ruta_legado)
+    assert len(df_legado) == 1  # legado: solo entidad 09
+    assert df_legado.iloc[0]["id"] == "09-1"
+    assert "nom_estab" in df_legado.columns
 
 
 def test_descargar_denue_no_deduplica_en_crudo_solo_en_procesado(monkeypatch, tmp_path: Path):
@@ -228,7 +313,7 @@ def test_descargar_denue_no_deduplica_en_crudo_solo_en_procesado(monkeypatch, tm
 
 def test_descargar_denue_omite_entidades_sin_registros(monkeypatch, tmp_path: Path):
     def obtener_registros_falso(termino_busqueda, codigo_entidad, token, tamano_pagina, segundos_espera):
-        return [{"Id": "1", "Nombre": "AFORE X"}] if codigo_entidad == "9" else []
+        return [{"Id": "1", "Nombre": "AFORE X"}] if codigo_entidad == "09" else []
 
     monkeypatch.setattr(
         "src.ingesta.descargar_denue.obtener_registros_entidad", obtener_registros_falso
@@ -239,7 +324,7 @@ def test_descargar_denue_omite_entidades_sin_registros(monkeypatch, tmp_path: Pa
     salidas = descargar_denue(configuracion)
 
     assert len(salidas) == 1
-    assert salidas[0].codigo_entidad == "9"
+    assert salidas[0].codigo_entidad == "09"
 
 
 def test_descargar_denue_lanza_error_sin_token(tmp_path: Path):
