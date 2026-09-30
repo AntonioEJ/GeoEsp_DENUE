@@ -1,0 +1,23 @@
+name: geoesp-denue
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pandas>=2.0
+  - numpy>=1.24
+  - geopandas>=0.14
+  - shapely>=2.0
+  - fiona>=1.9
+  - pyproj>=3.6
+  - rtree>=1.0
+  - matplotlib>=3.7
+  - seaborn>=0.13
+  - folium>=0.15
+  - plotly>=5.20
+  - scikit-learn>=1.3
+  - jupyter>=1.0
+  - ipykernel>=6.25
+  - pyyaml>=6.0
+  - python-dotenv>=1.0
+  - pytest>=7.4
+  - ruff>=0.4

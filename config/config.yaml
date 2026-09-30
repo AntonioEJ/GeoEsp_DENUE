@@ -1,0 +1,72 @@
+# Configuración general del proyecto GeoEsp_DENUE
+
+rutas:
+  datos_crudos: "data/raw"
+  datos_intermedios: "data/interim"
+  datos_procesados: "data/processed"
+  datos_externos: "data/external"
+  reportes_figuras: "reports/figures"
+  reportes_mapas: "reports/maps"
+
+denue:
+  # Fuente: API pública DENUE v1 (INEGI) - https://www.inegi.org.mx/servicios/api_denue.html
+  # Se usa el endpoint BuscarEntidad, que hace match de texto libre contra
+  # nombre/razón social y actividad económica del establecimiento.
+  # NOTA: no se usa la "descarga masiva" (ti=6) porque depende de un .exe de
+  # Windows con manifiesto de sesión, no automatizable de forma reproducible.
+  terminos_busqueda:
+    # Las 10 AFOREs autorizadas en México usan "AFORE" en su nombre comercial.
+    # La búsqueda se hace contra nombre comercial (Nombre/nom_estab) y razón
+    # social (Razon_social/raz_social) — ambas convenciones de nombre de
+    # columna (API vs. descarga masiva) — para no perder coincidencias que
+    # solo aparecen en una de las dos.
+    - "AFORE"
+  # Códigos de entidad federativa 01-32, SIEMPRE con dos dígitos (cero a la
+  # izquierda para 1-9, ej. "09" para Ciudad de México). Con un solo dígito
+  # ("9") la API responde HTTP 200 con cuerpo vacío, sin error — verificado
+  # contra la API real.
+  codigos_entidad:
+   # - "01"
+   # - "02"
+   # - "03"
+   # - "04"
+   # - "05"
+   # - "06"
+   #  - "07"
+   # - "08"
+    - "09"
+   # - "10"
+   # - "11"
+   # - "12"
+   # - "13"
+   # - "14"
+   # - "15"
+   # - "16"
+   # - "17"
+   # - "18"
+   # - "19"
+   # - "20"
+   # - "21"
+   # - "22"
+   # - "23"
+   # - "24"
+   # - "25"
+   # - "26"
+   # - "27"
+   # - "28"
+   # - "29"
+   # - "30"
+   # - "31"
+    - "32"
+  tamano_pagina: 1000 # máximo de registros documentado por llamada a la API
+  # JSON crudo tal como lo entrega la API, sin transformar (capa raw).
+  directorio_crudo: "data/raw/denue"
+  # CSV completo y CSV filtrado por marca (aplanados/filtrados = capa processed).
+  directorio_procesado: "data/processed/denue"
+  # Genera un CSV adicional filtrado por este texto sobre nombre/razón
+  # social (ej. "PROFUTURO"). Vacío ("") desactiva el CSV de subconjunto.
+  palabra_clave_subconjunto: "PROFUTURO"
+
+analisis:
+  radio_buffer_m: 1000
+  tamano_celda_kde_m: 500

@@ -1,0 +1,39 @@
+# NOTA: la fuente de verdad reproducible del proyecto es pyproject.toml +
+# uv.lock (ver `make setup` / `uv sync`). Este archivo se mantiene como
+# alternativa para entornos que solo usan pip.
+
+# Manejo de datos
+pandas>=2.0
+numpy>=1.24
+
+# Geoespacial
+geopandas>=0.14
+shapely>=2.0
+fiona>=1.9
+pyproj>=3.6
+rtree>=1.0
+
+# Visualización
+matplotlib>=3.7
+seaborn>=0.13
+folium>=0.15
+plotly>=5.20
+
+# Machine learning / clustering
+scikit-learn>=1.3
+
+# Notebooks
+jupyter>=1.0
+ipykernel>=6.25
+
+# Ingesta / HTTP
+requests>=2.31
+tenacity>=8.2
+
+# Configuración
+pyyaml>=6.0
+python-dotenv>=1.0
+
+# Testing / calidad
+pytest>=7.4
+ruff>=0.4

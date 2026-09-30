@@ -1,0 +1,79 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.Python
+*.so
+
+# --- Entornos virtuales ---
+.venv/
+venv/
+env/
+.conda/
+
+# --- Variables de entorno / secretos ---
+.env
+*.env.local
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# --- Testing / cobertura ---
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- Datos (no versionar datos crudos/intermedios pesados) ---
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/external/*
+!data/external/.gitkeep
+
+# --- Excepciones: se sube esta evidencia puntual de la Tarea 3 ---
+!entregables/Parte_1/denue_filtrado.csv
+
+# --- Archivos geoespaciales pesados / temporales ---
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.sbn
+*.sbx
+*.shp.xml
+*.gpkg-wal
+*.gpkg-shm
+*.tif
+*.tiff
+
+# --- Outputs de reportes generados (mantener carpetas, no contenido) ---
+reports/figures/*
+!reports/figures/.gitkeep
+reports/maps/*
+!reports/maps/.gitkeep
+
+# --- Modelos serializados ---
+models/*
+!models/.gitkeep
+*.pkl
+*.joblib
+
+# --- Sistema operativo / editores ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Instrucciones locales de Claude Code ---
+CLAUDE.md

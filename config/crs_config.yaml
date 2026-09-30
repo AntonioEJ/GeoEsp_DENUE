@@ -1,0 +1,12 @@
+# Configuración de sistemas de referencia de coordenadas (CRS) para el proyecto
+
+crs:
+  # CRS geográfico estándar (lat/lon), usado por el DENUE y para exportar a web (folium/plotly)
+  geografico: "EPSG:4326" # WGS84
+
+  # CRS proyectado recomendado para México, usado en cálculos de distancia/área/buffers
+  # Lambert Conformal Conic (marco geoestadístico INEGI)
+  proyectado_mexico: "EPSG:6372" # MGB Lambert - México ITRF2008
+
+  # CRS alternativo (Cónica Conforme de Lambert usada por INEGI en cartografía)
+  lambert_inegi: "ESRI:102010"
