@@ -112,8 +112,8 @@ un solo estado/giro como en el ejercicio de clase.
 
 ### Rúbrica 
 
-| Criterio | Puntos | Estado |
-|---|---|---|
+| Criterio | Puntos | 
+|---|---|
 | Parte 1 completa | 25 | 
 | Limpieza documentada (faltantes, duplicados) | 10 |
 | Parte 2: reto + requisito de rigor | 35 |
