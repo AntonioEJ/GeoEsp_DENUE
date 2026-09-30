@@ -12,7 +12,7 @@ library(readr)
 denue_filtrado <- read_csv("denue_filtrado.csv")
 
 mapa <- leaflet(denue_filtrado) %>%
-  addProviderTiles(providers$CartoDB.Positron) %>%
+  addProviderTiles(providers$OpenStreetMap) %>%
   addCircleMarkers(
     lng = ~longitud, lat = ~latitud,
     radius = 4, color = "#2A7DE1", stroke = FALSE, fillOpacity = 0.7,
