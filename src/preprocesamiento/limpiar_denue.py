@@ -230,6 +230,35 @@ def encontrar_csvs_crudos_recientes(directorio_crudo: Path) -> list[Path]:
     return [c for c in candidatos if c.stem.endswith(marca_reciente)]
 
 
+def encontrar_csv_nacional_reciente(
+    directorio_procesado: Path, palabra_clave_subconjunto: str = "AFORE"
+) -> Path:
+    """Busca el CSV nacional acumulado (todas las entidades) más reciente.
+
+    ``descargar_denue`` ya escribe, en cada corrida, un único CSV con todas
+    las entidades combinadas (``denue_<palabra_clave>_nacional_<timestamp>.csv``)
+    en ``directorio_procesado``; a diferencia de ``encontrar_csvs_crudos_recientes``,
+    no hace falta concatenar un archivo por entidad.
+
+    Args:
+        directorio_procesado: Carpeta donde `descargar_denue` escribe el CSV nacional.
+        palabra_clave_subconjunto: Palabra clave usada al descargar (ej. "AFORE").
+
+    Returns:
+        Ruta del CSV nacional más reciente.
+
+    Raises:
+        FileNotFoundError: Si no hay ningún CSV nacional en la carpeta.
+    """
+    identificador = palabra_clave_subconjunto.lower().replace(" ", "_")
+    candidatos = sorted(directorio_procesado.glob(f"denue_{identificador}_nacional_*.csv"))
+    if not candidatos:
+        raise FileNotFoundError(
+            f"No se encontró ningún CSV nacional en {directorio_procesado}. Corre primero: make download-denue"
+        )
+    return candidatos[-1]
+
+
 def limpiar_denue(
     directorio_crudo: Path,
     directorio_procesado: Path,

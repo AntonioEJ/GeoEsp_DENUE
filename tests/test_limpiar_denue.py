@@ -10,6 +10,7 @@ from src.preprocesamiento.limpiar_denue import (
     _extraer_codigo_entidad,
     _extraer_marca_tiempo,
     clasificar_marca_afore,
+    encontrar_csv_nacional_reciente,
     encontrar_csvs_crudos_recientes,
     extraer_municipio_estado,
     filtrar_afores,
@@ -126,6 +127,21 @@ def test_encontrar_csvs_crudos_recientes_toma_solo_la_corrida_mas_reciente(tmp_p
     resultado = encontrar_csvs_crudos_recientes(tmp_path)
 
     assert sorted(resultado) == sorted([reciente_9, reciente_15])
+
+
+def test_encontrar_csv_nacional_reciente_lanza_error_si_no_hay_archivos(tmp_path: Path):
+    with pytest.raises(FileNotFoundError):
+        encontrar_csv_nacional_reciente(tmp_path)
+
+
+def test_encontrar_csv_nacional_reciente_toma_el_mas_reciente(tmp_path: Path):
+    (tmp_path / "denue_afore_nacional_20260101_000000.csv").write_text("Id\n1\n")
+    reciente = tmp_path / "denue_afore_nacional_20260930_150832.csv"
+    reciente.write_text("Id\n1\n")
+
+    resultado = encontrar_csv_nacional_reciente(tmp_path)
+
+    assert resultado == reciente
 
 
 def test_limpiar_denue_genera_un_csv_limpio_por_entidad(tmp_path: Path):
