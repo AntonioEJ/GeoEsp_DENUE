@@ -73,4 +73,4 @@ municipios con población enlazada (0 `NA` en el `left_join`).
 (Iztacalco, Azcapotzalco, Xochimilco). El mapa normalizado es el que debería usarse para decidir
 dónde abrir una nueva sucursal por demanda potencial no cubierta.
 
-** La decisión que podría tomarse a partir de este análisis es abrir nuevas sucursales en municipios con alta demanda potencial no cubierta, según el mapa normalizado.**
+**La decisión que podría tomarse a partir de este análisis es abrir nuevas sucursales en municipios con alta demanda potencial no cubierta, según el mapa normalizado.**
