@@ -1,5 +1,9 @@
 # Taller MCD — Datos Geoespaciales (Clase 3)
 
+## Autor
+
+Alumno: 225576
+
 ## Entregables
 
 Los entregables de la Clase 3 (Taller MCD — Datos Geoespaciales) del Seminario de Métodos Analíticos de la Empresa - Datos se depositan en `entregables/`, separado por parte:
@@ -12,9 +16,9 @@ entregables/
 
 | Entregable | Estado |
 |---|---|
-| Documento de interpretación (1-2 cuartillas) | ⏳ pendiente |
+| Documento de interpretación (1-2 cuartillas) | ✅ concluida ([`entregables/Parte_2/01_OPCION_A.md`](entregables/Parte_2/01_OPCION_A.md)) |
 | Copia final en `entregables/Parte_1/` | ✅ concluida |
-| Copia final en `entregables/Parte_2/` | ⏳ pendiente |
+| Copia final en `entregables/Parte_2/` | ✅ concluida |
 
 ## Caso de uso: Datos Geoespaciales DENUE
 
@@ -101,24 +105,25 @@ un solo estado/giro como en el ejercicio de clase.
 
 ### Parte 2 — Reto
 
-**Opción x (a elegir):**
+**Estado: ✅ concluida** — opción elegida: **A. Coroplético normalizado**. Ver evidencia e
+ interpretación en [`entregables/Parte_2/01_OPCION_A.md`](entregables/Parte_2/01_OPCION_A.md).
 
 | Opción | Descripción | Requisito de rigor |
 |---|---|---|
-| A. Coroplético normalizado | Densidad de sucursales por municipio | Normalizar por población (por 10,000 hab.) y comparar ranking crudo vs. normalizado |
+| **A. Coroplético normalizado** ✅ | Densidad de sucursales por municipio | Normalizar por población (por 10,000 hab.) y comparar ranking crudo vs. normalizado |
 | B. Heatmap de densidad (KDE) | Mapa de calor de sucursales | Comparar ≥2 bandwidths y cruzar con densidad poblacional |
 | C. Proximidad/competencia | Índice de demanda potencial en ≥3 sitios candidatos | Contar competidores en radios de 500 m/1 km/2 km + población por buffer |
 | D. Score demográfico (AGEB) | Ranking de zonas por score cuantitativo | Score explícito (población objetivo / competidores cercanos), top 5 zonas |
 
 ### Rúbrica 
 
-| Criterio | Puntos | 
-|---|---|
-| Parte 1 completa | 25 | 
-| Limpieza documentada (faltantes, duplicados) | 10 |
-| Parte 2: reto + requisito de rigor | 35 |
-| Interpretación escrita y justificación | 20 |
-| Código reproducible, comentado, en tiempo | 10 |
+| Criterio | Puntos | Estado |
+|---|---|---|
+| Parte 1 completa | 25 | ✅ |
+| Limpieza documentada (faltantes, duplicados) | 10 | ✅ |
+| Parte 2: reto + requisito de rigor | 35 | ✅ |
+| Interpretación escrita y justificación | 20 | ✅ |
+| Código reproducible, comentado, en tiempo | 10 | ✅ |
 
 
 ## Anexos

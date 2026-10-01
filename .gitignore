@@ -9,6 +9,12 @@ dist/
 .Python
 *.so
 
+# --- R ---
+.RData
+.Rhistory
+.Rproj.user/
+*.Rproj
+
 # --- Entornos virtuales ---
 .venv/
 venv/

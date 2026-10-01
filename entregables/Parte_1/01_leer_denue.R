@@ -13,9 +13,11 @@
 library(tidyverse)  # dplyr, readr, stringr, tidyr
 
 # 1. Ruta al CSV del DENUE de Ciudad de México descargado de INEGI
-ruta_denue <- "../../data/processed/denue/denue_09_csv/conjunto_de_datos/denue_inegi_09_.csv"
+#ruta_denue <- "../../data/processed/denue/denue_09_csv/conjunto_de_datos/denue_inegi_09_.csv"
+ruta_denue <- "data/processed/denue/denue_09_csv/conjunto_de_datos/denue_inegi_09_.csv"
+#ruta_denue <- "data/processed/denue/denue_09_csv/conjunto_de_datos/denue_inegi_09_.csv"
 
-denue <- read_csv(ruta_denue, locale = locale(encoding = "UTF-8"))
+denue <- read_csv(ruta_denue, locale = locale(encoding = "latin1"))
 
 # 2. Explora la estructura general antes de hacer nada
 glimpse(denue)
@@ -33,7 +35,7 @@ denue %>%
 # 4. Filtra por el giro económico elegido
 #    "AFORE" aparece en el nombre del establecimiento (nom_estab)
 
-giro_buscado <- "afore "
+giro_buscado <- "afore"
 
 denue_filtrado <- denue %>%
   filter(str_detect(str_to_lower(nom_estab), giro_buscado)) %>%
