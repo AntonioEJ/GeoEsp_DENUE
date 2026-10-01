@@ -15,7 +15,7 @@ library(tidyverse)  # dplyr, readr, stringr, tidyr
 # 1. Ruta al CSV del DENUE de Ciudad de México descargado de INEGI
 ruta_denue <- "../../data/processed/denue/denue_09_csv/conjunto_de_datos/denue_inegi_09_.csv"
 
-denue <- read_csv(ruta_denue, locale = locale(encoding = "latin1"))
+denue <- read_csv(ruta_denue, locale = locale(encoding = "UTF-8"))
 
 # 2. Explora la estructura general antes de hacer nada
 glimpse(denue)
